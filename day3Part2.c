@@ -4,8 +4,8 @@
 #include <math.h>
 
 long long binStore2 = 0;
-const int binNum = 12;
-// const int binNum = 5;
+// const int binNum = 12;
+const int binNum = 5;
 
 
 int sumAColumn (int *arrayPointer, int colNum, int *arraySizePointer){
@@ -108,53 +108,64 @@ int main(){
     int oldArrayLength = newArrayLength;
 
     //==============make a temp array for the old data=========================
-    printf("This is the complete array\n");
+    // printf("This is the complete array\n");
     int * pTempDataArrayOld = malloc( (newArrayLength * binNum) * sizeof(int) );
+    if(!pTempDataArrayOld){
+            printf("did not reallocate correctly");
+            return -1;
+        }
     for(i=0; i < newArrayLength; i++) {
         for(j=0; j < binNum; j++) {
         *(pTempDataArrayOld + j + (i * binNum) ) = dataArray[i][j];
-        printf("%i ", *(pTempDataArrayOld + j + (i * binNum) ));
+        // printf("%i ", *(pTempDataArrayOld + j + (i * binNum) ));
         }
-        printf("\n");
+        // printf("\n");
     }
     printf("=============================\n");
 
 
 
-    while (newArrayLength != 1)
+    while (L<binNum)
     {
-                
-        //===================check for most commin first value=================
-        int dataArraySize[2] = {binNum, rowNum};
-        int *pDataArraySize = dataArraySize;
-        int arrayColSum = sumAColumn(pTempDataArrayOld,0, pDataArraySize);//col starts at 0
-        int binChoice = 0;
-        if(arrayColSum < dataArraySize[1]/2 - 1){
-                printf("The choice is 0 for column %i\n", L);
-            }else{
-                printf("The choice is 1 for column %i\n", L);
-                binChoice = 1;
-            }
-
-        //=======================count the size of the next array to make===========
-        L = 0;
-        newArrayLength = 0;
-        for(i=0; i < 10; i++) {
+        
+        ////////////////////////////////////////////////////////////////////////////
+        printf("Debug1\n");
+        for(i=0; i < oldArrayLength; i++) {
             for(j=0; j < binNum; j++) {
                 printf("%i ",*(pTempDataArrayOld + j + (i * binNum)));
             }
             printf("\n");
         }
-        printf("matching the bin to choice\n");
-        for(j=0;j<oldArrayLength+1;j++) {
+        //////////////////////////////////////////////////////////////////////////////////
+        //===================check for most commin first value=================
+        int dataArraySize[2] = {binNum, oldArrayLength};
+        int *pDataArraySize = dataArraySize;
+        int arrayColSum = sumAColumn(pTempDataArrayOld,L, pDataArraySize);//col starts at 0
+        int binChoice = 0;
+        if(arrayColSum >= (double)dataArraySize[1]/2){
+                printf("The choice for column %i is 1 because the sum is %i\n", L+1, arrayColSum);
+                binChoice = 1;
+            }else{
+                printf("The choice for column %i is 0 because the sum is %i\n", L+1, arrayColSum);
+            }
+
+        //=======================count the size of the next array to make===========
+
+
+        newArrayLength = 0;
+
+
+
+
+        printf("matching to bin to choice\n");
+        for(j=0;j<oldArrayLength;j++) {
             if (*(pTempDataArrayOld + L + j * binNum) == binChoice){
                 newArrayLength++;                
             }
-            printf("%i",*(pTempDataArrayOld + L + j * binNum));
+            printf("%i ",*(pTempDataArrayOld + L + j * binNum));
         }
         printf("\n");
         //==================================making new reduced array from old===============
-
         // int tempdataArray[newArrayLength][binNum];
         int * pTempDataArray = malloc( (newArrayLength * binNum) * sizeof(int) );
         // pTempDataArray = tempdataArray[0];
@@ -163,7 +174,6 @@ int main(){
         int k = 0;
         for(i=0; i < oldArrayLength; i++) {
         if (*(pTempDataArrayOld + L + (i * binNum)) == binChoice){
-            
             // printf("This is the logic compared to bin choice %i\n", *(pTempDataArrayOld + L + (i * binNum)));
                 for(j=0; j < binNum; j++) {
                     *(pTempDataArray + j + (k * binNum) ) = *(pTempDataArrayOld + j + (i * binNum) );
@@ -176,7 +186,12 @@ int main(){
         L++;
         //=====================make current into old====================================
         // printf("This is making the current into the old \" temp data array old \"\n");
-        int * pTempDataArrayOld = realloc(pTempDataArrayOld, (newArrayLength * binNum) * sizeof(int) );
+        // int * pTempDataArrayOld = realloc(pTempDataArrayOld, (newArrayLength * binNum) * sizeof(int) );
+        if(!pTempDataArrayOld){
+            printf("did not reallocate correctly");
+            return -1;
+        }
+        // printf("Reallocation\n");
         for(i=0; i < newArrayLength; i++) {
             for(j=0; j < binNum; j++) {
                 *(pTempDataArrayOld + j + (i * binNum) ) = *(pTempDataArray + j + (i * binNum) );
@@ -186,11 +201,25 @@ int main(){
         }
         oldArrayLength = newArrayLength;
 
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! we may not need old array length anywhere
+        //////////////////////////////////////////////////////////////////////////////
+        // printf("Debug2\n");
+        // for(i=0; i < oldArrayLength; i++) {
+        //     for(j=0; j < binNum; j++) {
+        //         printf("%i ",*(pTempDataArrayOld + j + (i * binNum)));
+        //     }
+        //     printf("\n");
+        // }
+        ////////////////////////////////////////////////////////////////////////////////////
+
+
         free(pTempDataArray);
         pTempDataArray = NULL;
 
-        printf("=============================\n");
+        printf("=====================================================================================================================================\n");
+    }
+    printf("The answer for the oxygen one is: ");
+    for(j=0; j < binNum; j++) {
+        printf("%i ",*(pTempDataArrayOld + j));
     }
 
     free(pTempDataArrayOld);
